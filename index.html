@@ -159,6 +159,10 @@
       background: var(--klimax-purple-card);
       border: 1px solid rgba(255, 255, 255, 0.1);
       transition: transform 0.4s ease, border-color 0.4s ease;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     /* --- MARQUEE DE CARDS DE TRABAJOS --- */
@@ -170,18 +174,26 @@
 
     .portfolio-track {
       display: flex;
+      align-items: stretch;
       --card-w: 280px;
       --card-gap: 24px;
       gap: var(--card-gap);
       width: max-content;
       animation: marqueeMove 35s linear infinite;
       will-change: transform;
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .portfolio-track:active {
+      cursor: grabbing;
     }
 
     /* Se mueve de izquierda a derecha: entra por la izquierda, sale por la derecha, loop invisible */
     @keyframes marqueeMove {
       from {
-        transform: translateX(calc(-4 * (var(--card-w) + var(--card-gap))));
+        transform: translateX(calc(-5 * (var(--card-w) + var(--card-gap))));
       }
 
       to {
@@ -192,6 +204,7 @@
     .portfolio-card-item {
       flex: 0 0 auto;
       width: var(--card-w);
+      display: flex;
     }
 
     @media (max-width: 768px) {
@@ -212,10 +225,33 @@
       object-fit: cover;
       opacity: 0.9;
       transition: opacity 0.4s ease;
+      pointer-events: none;
     }
 
     .portfolio-card:hover .portfolio-img {
       opacity: 1;
+    }
+
+    .portfolio-card .p-4 {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+    }
+
+    .portfolio-card .p-4 .d-flex.gap-2 {
+      flex-wrap: wrap;
+    }
+
+    .portfolio-card .p-4 h4 {
+      min-height: 2.4em;
+    }
+
+    .portfolio-card .p-4 p {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1;
     }
 
     .tag {
@@ -225,6 +261,13 @@
       border-radius: 20px;
       font-size: 0.85rem;
       font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .tag {
+        font-size: 0.75rem;
+        padding: 3px 10px;
+      }
     }
 
     /* BOTONES KLIMAX */
@@ -254,8 +297,8 @@
     /* --- BURBUJA FLOTANTE DE WHATSAPP --- */
     .whatsapp-float {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      right: max(24px, env(safe-area-inset-right));
       width: 60px;
       height: 60px;
       background-color: var(--klimax-lime);
@@ -266,7 +309,7 @@
       justify-content: center;
       font-size: 2rem;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-      z-index: 999;
+      z-index: 1051;
       text-decoration: none;
       transition: all 0.3s ease;
     }
@@ -283,8 +326,8 @@
         width: 52px;
         height: 52px;
         font-size: 1.6rem;
-        bottom: 18px;
-        right: 18px;
+        bottom: max(18px, env(safe-area-inset-bottom));
+        right: max(18px, env(safe-area-inset-right));
       }
     }
 
@@ -404,23 +447,23 @@
 
       <!-- MARQUEE DE TRABAJOS — FUERA DEL .container, A ANCHO COMPLETO DE PANTALLA -->
       <div class="portfolio-marquee-wrapper">
-        <div class="portfolio-track">
+        <div class="portfolio-track" id="portfolioTrack">
 
           <!-- ================= BLOQUE 1 ================= -->
 
           <!-- Proyecto 1 -->
           <div class="portfolio-card-item">
             <div class="portfolio-card">
-              <div id="carouselProyecto1b" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+              <div id="carouselProyecto1" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
                 <div class="carousel-inner">
                   <div class="carousel-item active"><img src="paovalijamagica1.jpg" alt="Proyecto 1"
                       class="portfolio-img"></div>
                   <div class="carousel-item"><img src="paovalijamagica2.jpg" alt="Proyecto 1" class="portfolio-img">
                   </div>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProyecto1b"
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProyecto1"
                   data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselProyecto1b"
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselProyecto1"
                   data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
               </div>
               <div class="p-4">
@@ -650,11 +693,91 @@
 
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   <!-- BURBUJA FLOTANTE DE WHATSAPP -->
   <a href="https://wa.me/5492615071728?text=Hola%20Klimax!%20Quiero%20consultar%20por%20sus%20servicios%20de%20marketing."
     target="_blank" class="whatsapp-float" aria-label="Chatear por WhatsApp">
     <i class="bi bi-whatsapp"></i>
   </a>
+
+  <!-- SCRIPT: fallback de loop de video + arrastre manual del marquee -->
+  <script>
+    // Fallback: fuerza el reinicio del video si el navegador no lo hace solo (bug conocido en algunos mobile)
+    document.querySelectorAll('.hero-video').forEach(function (video) {
+      video.addEventListener('ended', function () {
+        video.currentTime = 0;
+        video.play().catch(function () { });
+      });
+    });
+
+    // Arrastre manual del marquee de trabajos, sin perder el loop automático
+    (function () {
+      var track = document.getElementById('portfolioTrack');
+      if (!track) return;
+
+      var isDown = false;
+      var startX = 0;
+      var startTranslate = 0;
+      var cssDuration = parseFloat(getComputedStyle(track).animationDuration) || 35;
+
+      function getCurrentTranslateX() {
+        var style = getComputedStyle(track);
+        var transform = style.transform;
+        if (transform === 'none') return 0;
+        var matrix = transform.match(/^matrix\(([^)]+)\)$/);
+        if (matrix) {
+          var values = matrix[1].split(',').map(parseFloat);
+          return values[4] || 0;
+        }
+        return 0;
+      }
+
+      function getDistance() {
+        var styles = getComputedStyle(track);
+        var cardW = parseFloat(styles.getPropertyValue('--card-w'));
+        var gap = parseFloat(styles.getPropertyValue('--card-gap'));
+        return 5 * (cardW + gap);
+      }
+
+      function pointerDown(e) {
+        isDown = true;
+        startX = e.clientX;
+        startTranslate = getCurrentTranslateX();
+        track.style.animationPlayState = 'paused';
+        track.style.transform = 'translateX(' + startTranslate + 'px)';
+      }
+
+      function pointerMove(e) {
+        if (!isDown) return;
+        var dx = e.clientX - startX;
+        track.style.transform = 'translateX(' + (startTranslate + dx) + 'px)';
+      }
+
+      function pointerUp() {
+        if (!isDown) return;
+        isDown = false;
+
+        var currentX = getCurrentTranslateX();
+        var D = getDistance();
+        var duration = cssDuration;
+
+        // Calcula en qué punto del ciclo quedó, para retomar el loop sin saltos
+        var t = duration * (1 + currentX / D);
+        t = ((t % duration) + duration) % duration;
+
+        track.style.transform = '';
+        track.style.animation = 'none';
+        void track.offsetWidth; // fuerza reflow para poder reiniciar la animación
+        track.style.animation = 'marqueeMove ' + duration + 's linear infinite';
+        track.style.animationDelay = (-t) + 's';
+      }
+
+      track.addEventListener('pointerdown', pointerDown);
+      window.addEventListener('pointermove', pointerMove);
+      window.addEventListener('pointerup', pointerUp);
+      window.addEventListener('pointercancel', pointerUp);
+    })();
+  </script>
 </body>
 
 </html>
