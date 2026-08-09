@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klimax</title>
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --klimax-purple: #664792;
+      --klimax-lime: #abc435;
+      --klimax-dark: #0f0d13;
+      --klimax-purple-card: #56397e;
+    }
+
+    body {
+      background-color: var(--klimax-dark);
+      color: #ffffff;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* --- NAVBAR --- */
+    .navbar {
+      background: rgba(15, 13, 19, 0.7);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .navbar-brand {
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--klimax-lime) !important;
+      letter-spacing: -1px;
+    }
+
+    .nav-link {
+      color: #ffffff !important;
+      font-weight: 500;
+      margin: 0 10px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--klimax-lime) !important;
+    }
+
+    /* --- VIDEO FIJO DE FONDO --- */
+    .hero-fixed-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .hero-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 13, 19, 0.25);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      color: var(--klimax-lime);
+      font-size: 2rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translate(-50%, 0);
+      }
+
+      40% {
+        transform: translate(-50%, -10px);
+      }
+
+      60% {
+        transform: translate(-50%, -5px);
+      }
+    }
+
+    /* --- ESPACIADOR PARA EL VIDEO --- */
+    .hero-spacer {
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* --- SECCIÓN UNIFICADA (FRASE + TRABAJOS) --- */
+    .main-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    .unified-section {
+      background-color: var(--klimax-purple);
+      padding-top: 60px;
+      padding-bottom: 100px;
+      border-top-left-radius: 40px;
+      border-top-right-radius: 40px;
+      box-shadow: 0 -25px 50px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Frase estirada a lo ancho */
+    .phrase-title {
+      font-size: clamp(2.2rem, 5.5vw, 5rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: #ffffff;
+      text-align: left;
+      margin-bottom: 80px;
+    }
+
+    .text-highlight {
+      color: var(--klimax-lime);
+    }
+
+    /* Tarjetas de portafolio */
+    .portfolio-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--klimax-purple-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.4s ease, border-color 0.4s ease;
+    }
+
+    /* --- MARQUEE DE CARDS DE TRABAJOS --- */
+    .portfolio-marquee-wrapper {
+      overflow: hidden;
+      width: 100%;
+      padding-top: 8px;
+    }
+
+    .portfolio-track {
+      display: flex;
+      --card-w: 280px;
+      --card-gap: 24px;
+      gap: var(--card-gap);
+      width: max-content;
+      animation: marqueeMove 35s linear infinite;
+      will-change: transform;
+    }
+
+    /* Se mueve de izquierda a derecha: entra por la izquierda, sale por la derecha, loop invisible */
+    @keyframes marqueeMove {
+      from {
+        transform: translateX(calc(-4 * (var(--card-w) + var(--card-gap))));
+      }
+
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    .portfolio-card-item {
+      flex: 0 0 auto;
+      width: var(--card-w);
+    }
+
+    @media (max-width: 768px) {
+      .portfolio-track {
+        --card-w: 200px;
+        --card-gap: 16px;
+      }
+    }
+
+    .portfolio-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--klimax-lime);
+    }
+
+    .portfolio-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      opacity: 0.9;
+      transition: opacity 0.4s ease;
+    }
+
+    .portfolio-card:hover .portfolio-img {
+      opacity: 1;
+    }
+
+    .tag {
+      background-color: rgba(171, 196, 53, 0.2);
+      color: var(--klimax-lime);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* BOTONES KLIMAX */
+    .btn-klimax-wsp {
+      background-color: var(--klimax-lime);
+      color: var(--klimax-dark);
+      font-weight: 800;
+      font-size: 1.2rem;
+      padding: 16px 36px;
+      border-radius: 50px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-klimax-wsp:hover {
+      background-color: #ffffff;
+      color: var(--klimax-purple);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(171, 196, 53, 0.3);
+    }
+
+
+    /* --- BURBUJA FLOTANTE DE WHATSAPP --- */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background-color: var(--klimax-lime);
+      color: var(--klimax-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      z-index: 999;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .whatsapp-float:hover {
+      background-color: #ffffff;
+      color: var(--klimax-purple);
+      transform: scale(1.1);
+      box-shadow: 0 10px 25px rgba(171, 196, 53, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .whatsapp-float {
+        width: 52px;
+        height: 52px;
+        font-size: 1.6rem;
+        bottom: 18px;
+        right: 18px;
+      }
+    }
+
+    /* --- CONTACTO SIMPLIFICADO --- */
+    .contact-section {
+      background-color: #08070a;
+      padding: 120px 0 80px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .contact-link-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 30px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .contact-link-box:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--klimax-lime);
+      color: #fff;
+      transform: translateY(-3px);
+    }
+
+    .contact-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(171, 196, 53, 0.1);
+      color: var(--klimax-lime);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER / NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="logo.png" alt="Klimax" style="height: 45px; width: auto;">
+      </a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#trabajos">Trabajos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- VIDEO FIJO DE FONDO -->
+  <div class="hero-fixed-background" id="inicio">
+    <video class="hero-video d-none d-md-block" autoplay loop muted playsinline>
+      <source src="video-desktop.mp4" type="video/mp4">
+    </video>
+
+    <video class="hero-video d-block d-md-none" autoplay loop muted playsinline>
+      <source src="video-mobile.mp4" type="video/mp4">
+    </video>
+
+    <div class="hero-overlay"></div>
+
+    <div class="scroll-indicator">
+      <i class="bi bi-chevron-down"></i>
+    </div>
+  </div>
+
+  <!-- ESPACIADOR PARA EL SCROLL DEL VIDEO -->
+  <div class="hero-spacer"></div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="main-content">
+
+    <!-- SECCIÓN PÚRPURA (FRASE + TRABAJOS) -->
+    <section id="filosofia" class="unified-section">
+
+      <!-- CONTENEDOR FLUIDO: Ocupa todo el ancho de la pantalla para la frase -->
+      <div class="container-fluid px-4 px-md-5">
+        <div class="row">
+          <div class="col-12">
+            <h2 class="phrase-title">
+              Llevamos tu negocio hacia su klimax. Ese lugar donde el crecimiento es <span
+                class="text-highlight">inevitable</span> y la <span class="text-highlight">cima</span> tu nuevo
+              estándar.
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR NORMAL: Solo el encabezado de texto mantiene el margen prolijo -->
+      <div class="container">
+        <div id="trabajos" class="row mb-4 align-items-end pt-2">
+          <div class="col-md-8">
+            <span class="text-uppercase tracking-wider fs-6 text-highlight fw-bold">Nuestros Casos de Éxito</span>
+            <h3 class="display-5 fw-bold mt-1 text-white">Confiaron en nosotros</h3>
+          </div>
+          <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <p class="text-white-50 mb-0">Explora lo que hemos construido con nuestros clientes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARQUEE DE TRABAJOS — FUERA DEL .container, A ANCHO COMPLETO DE PANTALLA -->
+      <div class="portfolio-marquee-wrapper">
+        <div class="portfolio-track">
+
+          <!-- ================= BLOQUE 1 ================= -->
+
+          <!-- Proyecto 1 -->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <div id="carouselProyecto1b" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+                <div class="carousel-inner">
+                  <div class="carousel-item active"><img src="paovalijamagica1.jpg" alt="Proyecto 1"
+                      class="portfolio-img"></div>
+                  <div class="carousel-item"><img src="paovalijamagica2.jpg" alt="Proyecto 1" class="portfolio-img">
+                  </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProyecto1b"
+                  data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselProyecto1b"
+                  data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+              </div>
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3"><span class="tag">Branding</span><span class="tag">Página Web</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Pao Valija Mágica</h4>
+                <p class="text-white-50 mb-0">Desarrollo web a medida.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 2 -->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="tuvisaconamy.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Página Web</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Tu visa con Amy</h4>
+                <p class="text-white-50 mb-0"> Desarrollo de página web a medida.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 3 -->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="moments1.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Branding</span>
+                  <span class="tag">Identidad de marca</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Moment´s</h4>
+                <p class="text-white-50 mb-0"> Carteleria, creación y aplicación de identidad de marca
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 4 -->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="cynthiaviajesmagicos.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Branding</span>
+                  <span class="tag">Identidad de marca</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Cynthia viajes mágicos</h4>
+                <p class="text-white-50 mb-0"> Creación y aplicación de identidad de marca. Diseño de lanyards.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 5 -->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="volantealhilo.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Página Web</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Volante al Hilo</h4>
+                <p class="text-white-50 mb-0"> Aplicación web para adminsitración
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- ================= BLOQUE 2 (DUPLICADO PARA EL LOOP INFINITO) ================= -->
+
+          <!-- Proyecto 1b (dos fotos)-->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <div id="carouselProyecto1b" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+                <div class="carousel-inner">
+                  <div class="carousel-item active"><img src="paovalijamagica1.jpg" alt="Proyecto 1"
+                      class="portfolio-img"></div>
+                  <div class="carousel-item"><img src="paovalijamagica2.jpg" alt="Proyecto 1" class="portfolio-img">
+                  </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProyecto1b"
+                  data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselProyecto1b"
+                  data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+              </div>
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3"><span class="tag">Branding</span><span class="tag">Página Web</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Pao Valija Mágica</h4>
+                <p class="text-white-50 mb-0">Desarrollo web a medida.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 2b (una foto )-->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="tuvisaconamy.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Página Web</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Tu visa con Amy</h4>
+                <p class="text-white-50 mb-0"> Desarrollo de página web a medida.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 3b (una foto)-->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="moments1.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Branding</span>
+                  <span class="tag">Identidad de marca</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Moment´s</h4>
+                <p class="text-white-50 mb-0"> Carteleria, creación y aplicación de identidad de marca
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 4b (una foto)-->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="cynthiaviajesmagicos.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Branding</span>
+                  <span class="tag">Identidad de marca</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Cynthia viajes mágicos</h4>
+                <p class="text-white-50 mb-0"> Creación y aplicación de identidad de marca. Diseño de lanyards.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto 5b (una foto)-->
+          <div class="portfolio-card-item">
+            <div class="portfolio-card">
+              <img src="volantealhilo.jpg" alt="Proyecto" class="portfolio-img">
+              <div class="p-4">
+                <div class="d-flex gap-2 mb-3">
+                  <span class="tag">Página Web</span>
+                </div>
+                <h4 class="h4 fw-bold text-white">Volante al Hilo</h4>
+                <p class="text-white-50 mb-0"> Aplicación web para adminsitración
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CONTACTO SIMPLIFICADO -->
+    <section id="contacto" class="contact-section text-center">
+      <div class="container">
+
+        <span class="text-uppercase tracking-wider fs-6 text-highlight fw-bold">Hablemos</span>
+        <h2 class="display-3 fw-bold mt-2 mb-3">¿Tenés un proyecto en mente?</h2>
+        <p class="text-secondary fs-5 mb-5 mx-auto" style="max-width: 600px;">
+          Escribinos directamente y coordinamos una reunión para llevar tu marca al siguiente nivel.
+        </p>
+
+        <!-- BOTÓN PRINCIPAL A WHATSAPP -->
+        <div class="mb-5">
+          <a href="https://wa.me/5492615071728?text=Hola%20Klimax!%20Quiero%20consultar%20por%20sus%20servicios%20de%20marketing."
+            target="_blank" class="btn-klimax-wsp">
+            <i class="bi bi-whatsapp fs-3"></i> Charlar por WhatsApp
+          </a>
+        </div>
+
+        <!-- TARJETAS SECUNDARIAS (INSTAGRAM Y MAIL) -->
+        <div class="row g-4 justify-content-center max-w-900 mx-auto pt-3">
+
+          <!-- CORREO -->
+          <div class="col-md-5">
+            <a href="mailto:klimax.agency26@klimax.com" class="contact-link-box">
+              <div class="contact-icon">
+                <i class="bi bi-envelope-at"></i>
+              </div>
+              <div class="text-start">
+                <small class="text-secondary d-block text-uppercase fw-semibold">Correo Electrónico</small>
+                <strong class="fs-6">klimax.agency26@klimax.com</strong>
+              </div>
+            </a>
+          </div>
+
+          <!-- INSTAGRAM -->
+          <div class="col-md-5">
+            <a href="https://instagram.com/klimax.agency" target="_blank" class="contact-link-box">
+              <div class="contact-icon">
+                <i class="bi bi-instagram"></i>
+              </div>
+              <div class="text-start">
+                <small class="text-secondary d-block text-uppercase fw-semibold">Síguenos</small>
+                <strong class="fs-6">@klimax.agency</strong>
+              </div>
+            </a>
+          </div>
+
+        </div>
+
+        <hr class="mt-5 mb-4" style="border-color: rgba(255,255,255,0.1);">
+
+        <!-- FOOTER / COPYRIGHT -->
+        <p class="text-secondary small mb-0">&copy; 2026 Klimax Marketing. Todos los derechos reservados.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- BURBUJA FLOTANTE DE WHATSAPP -->
+  <a href="https://wa.me/5492615071728?text=Hola%20Klimax!%20Quiero%20consultar%20por%20sus%20servicios%20de%20marketing."
+    target="_blank" class="whatsapp-float" aria-label="Chatear por WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+</body>
+
+</html>
