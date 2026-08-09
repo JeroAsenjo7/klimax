@@ -722,7 +722,7 @@
       var dragged = false;
       var cssDuration = parseFloat(getComputedStyle(track).animationDuration) || 35;
 
-      function getCurrentTranslateX() {
+      function getComputedTranslateX() {
         var style = getComputedStyle(track);
         var transform = style.transform;
         if (transform === 'none') return 0;
@@ -746,9 +746,14 @@
         dragged = false;
         pointerId = e.pointerId;
         startX = e.clientX;
-        startTranslate = getCurrentTranslateX();
-        track.style.animationPlayState = 'paused';
+
+        // Toma la posición actual ANTES de sacar la animación
+        startTranslate = getComputedTranslateX();
+
+        // Saca la animación por completo (pausarla no alcanza: seguiría controlando "transform")
+        track.style.animation = 'none';
         track.style.transform = 'translateX(' + startTranslate + 'px)';
+
         track.setPointerCapture(pointerId);
       }
 
@@ -764,7 +769,7 @@
         isDown = false;
         track.releasePointerCapture(pointerId);
 
-        var currentX = getCurrentTranslateX();
+        var currentX = getComputedTranslateX();
         var D = getDistance();
         var duration = cssDuration;
 
@@ -773,7 +778,7 @@
 
         track.style.transform = '';
         track.style.animation = 'none';
-        void track.offsetWidth;
+        void track.offsetWidth; // fuerza reflow para reiniciar limpio
         track.style.animation = 'marqueeMove ' + duration + 's linear infinite';
         track.style.animationDelay = (-t) + 's';
       }
