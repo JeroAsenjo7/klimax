@@ -716,8 +716,10 @@
       if (!track) return;
 
       var isDown = false;
+      var pointerId = null;
       var startX = 0;
       var startTranslate = 0;
+      var dragged = false;
       var cssDuration = parseFloat(getComputedStyle(track).animationDuration) || 35;
 
       function getCurrentTranslateX() {
@@ -736,48 +738,60 @@
         var styles = getComputedStyle(track);
         var cardW = parseFloat(styles.getPropertyValue('--card-w'));
         var gap = parseFloat(styles.getPropertyValue('--card-gap'));
-        return 5 * (cardW + gap);
+        return 5 * (cardW + gap); // cambiá el 5 si en el futuro cambia la cantidad de proyectos por bloque
       }
 
-      function pointerDown(e) {
+      function onPointerDown(e) {
         isDown = true;
+        dragged = false;
+        pointerId = e.pointerId;
         startX = e.clientX;
         startTranslate = getCurrentTranslateX();
         track.style.animationPlayState = 'paused';
         track.style.transform = 'translateX(' + startTranslate + 'px)';
+        track.setPointerCapture(pointerId);
       }
 
-      function pointerMove(e) {
-        if (!isDown) return;
+      function onPointerMove(e) {
+        if (!isDown || e.pointerId !== pointerId) return;
         var dx = e.clientX - startX;
+        if (Math.abs(dx) > 3) dragged = true;
         track.style.transform = 'translateX(' + (startTranslate + dx) + 'px)';
       }
 
-      function pointerUp() {
-        if (!isDown) return;
+      function onPointerUp(e) {
+        if (!isDown || e.pointerId !== pointerId) return;
         isDown = false;
+        track.releasePointerCapture(pointerId);
 
         var currentX = getCurrentTranslateX();
         var D = getDistance();
         var duration = cssDuration;
 
-        // Calcula en qué punto del ciclo quedó, para retomar el loop sin saltos
         var t = duration * (1 + currentX / D);
         t = ((t % duration) + duration) % duration;
 
         track.style.transform = '';
         track.style.animation = 'none';
-        void track.offsetWidth; // fuerza reflow para poder reiniciar la animación
+        void track.offsetWidth;
         track.style.animation = 'marqueeMove ' + duration + 's linear infinite';
         track.style.animationDelay = (-t) + 's';
       }
 
-      track.addEventListener('pointerdown', pointerDown);
-      window.addEventListener('pointermove', pointerMove);
-      window.addEventListener('pointerup', pointerUp);
-      window.addEventListener('pointercancel', pointerUp);
+      track.addEventListener('pointerdown', onPointerDown);
+      track.addEventListener('pointermove', onPointerMove);
+      track.addEventListener('pointerup', onPointerUp);
+      track.addEventListener('pointercancel', onPointerUp);
+
+      // Evita que un link/flecha del carousel se active de golpe si en realidad el usuario estaba arrastrando
+      track.addEventListener('click', function (e) {
+        if (dragged) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
     })();
-  </script>
+</script>
 </body>
 
 </html>
